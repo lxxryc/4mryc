@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>4u</title>
+  <style>
+    :root {
+      --bg:#111827;    
+      --text:#f9fafb;
+      --muted:#9ca3af;
+      --card:#1f2937;
+      --accent:#9ca3af;
+      --accent-2:#6b7280;
+      --danger:#ef4444;
+      --divider:#374151;
+      --shadow:0 8px 20px rgba(0,0,0,.4);
+      --radius:14px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:"Georgia",serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      padding:16px;
+    }
+
+    #messageBox {
+      background:var(--card);
+      border:1px solid var(--divider);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:24px;
+      width:100%;
+      max-width:500px;
+      min-height:160px;
+      max-height:70vh;
+      overflow-y:auto;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;  
+      text-align:justify;
+
+      -webkit-text-size-adjust: none;  
+      text-size-adjust: none;
+      overflow-wrap: break-word; 
+      word-break: break-word;
+    }
+
+    #messageBox::-webkit-scrollbar {
+      display: none;
+    }
+    #messageBox {
+      -ms-overflow-style: none;   
+      scrollbar-width: none;    
+    }
+
+    #message p {
+      font-size:1rem;
+      line-height:1.7;
+      margin-bottom:16px;
+      text-align: justify;
+    }
+
+    #message .author {
+      display:block;
+      margin-top:8px;
+      font-size:.95rem;
+      color:var(--muted);
+      text-align:center;
+    }
+    #message .author a {
+      color:var(--accent);
+      font-weight:600;
+      text-decoration:none;
+    }
+    #status {
+      font-weight:600;
+      font-size:1rem;
+      margin-top:8px;
+      text-align:center;
+    }
+    #leaveThought {
+      display:none; 
+      margin-top: 15px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: white;
+      font-size: .9rem;
+      cursor: pointer;
+    }
+    #leaveThought:hover {
+      background:var(--accent-2);
+    }
+    footer {
+      margin-top:20px;
+      font-size:.8rem;
+      color:var(--muted);
+      text-align:center;
+    }
+    .fade-out { animation: fade 1s forwards; }
+    @keyframes fade { from { opacity:1; } to { opacity:0; } }
+
+    #modalOverlay {
+      display:none;
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.5);
+      backdrop-filter: blur(2px);
+      justify-content:center;
+      align-items:center;
+      z-index:1000;
+    }
+    #modalBox {
+      background:var(--card);
+      padding:20px;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      max-width:360px;
+      width:90%;
+      animation: popUp .3s ease;
+    }
+    @keyframes popUp {
+      from { transform:scale(.9); opacity:0; }
+      to { transform:scale(1); opacity:1; }
+    }
+    #modalBox h2 {
+      margin-bottom:10px;
+      font-size:1.1rem;
+    }
+    #modalBox form textarea {
+      width:100%;
+      height:80px;
+      border:1px solid var(--divider);
+      border-radius:var(--radius);
+      padding:8px;
+      font-family:"Georgia",serif;
+      font-size:.9rem;
+      margin-bottom:10px;
+      resize:none;
+    }
+    #modalBox form button {
+      background:var(--accent);
+      color:white;
+      border:none;
+      padding:8px 14px;
+      border-radius:var(--radius);
+      cursor:pointer;
+    }
+    #modalBox form button:hover {
+      background:var(--accent-2);
+    }
+    #formMessage {
+      margin-top:8px;
+      font-size:.9rem;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="messageBox">
+    <div id="message"></div>  
+    <p id="status"></p>
+    <button id="leaveThought">leave a thought</button>
+  </div>
+
+  <footer>LX</footer>
+
+  <div id="modalOverlay">
+    <div id="modalBox">
+      <form id="thoughtForm" action="https://formspree.io/f/mvgblwol" method="POST">
+        <textarea name="thought" placeholder="write your thought..." required></textarea>
+        <button type="submit">Send</button>
+      </form>
+      <div id="formMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    const FIXED_DURATION = 60;  
+    const THOUGHT_VERSION = "letter-royce-v1";  
+
+    const THOUGHT_TEXT = {
+      paragraphs: [
+        "Hi, I know you’re someone truly aligned with Royce. First, I want to apologize for not handling or stabilizing the space well. I understand if you’ve felt frustrated with the attitude and behavior in the GC — I also feel the same way.",
+        "Please know that I’ve thought about guiding them, pero honestly, my principles won’t allow me to. Protecting my dignity matters, and I believe they’re already adults who should know better. If I keep explaining, it might come off as me trying to please them, and that’s not what Royce stands for.",
+        "So kita nalang ang mag-adjust, since wala man tay control ug ingana sila. That’s why I’d rather focus my energy on those who are genuinely aligned. I’m really grateful nagka-ila ta, and I acknowledge our bond. Maybe in the right time, we can rebuild Royce in another way, with the right people and the right energy.",
+        "For now, I just want to say sorry for my failure, sorry if my old friends treated you unfairly. Honestly, I see that as a betrayal too, since you are also my friend.",
+        "If you’re reading this, I hope you’re in good spirits. Godspeed sa tanan nga naa sa imong life karon ug sa future. I truly hope to meet you soon when the time is right for us to start fresh."
+      ],
+      author: "— from me"
+    };
+
+    const messageEl = document.getElementById("message");
+    const statusEl = document.getElementById("status");
+    const leaveBtn = document.getElementById("leaveThought");
+    const modalOverlay = document.getElementById("modalOverlay");
+    const thoughtForm = document.getElementById("thoughtForm");
+    const formMessage = document.getElementById("formMessage");
+
+    function renderThought() {
+      const paragraphsHTML = THOUGHT_TEXT.paragraphs
+        .map(p => `<p>${p}</p>`)
+        .join("");
+
+      messageEl.innerHTML = `
+        ${paragraphsHTML}
+        <span class="author">${THOUGHT_TEXT.author}</span>
+      `;
+    }
+
+    if (leaveBtn) {
+      leaveBtn.onclick = () => { modalOverlay.style.display = "flex"; };
+    }
+
+    if (modalOverlay) {
+      modalOverlay.onclick = (e) => {
+        if (e.target === modalOverlay) {
+          modalOverlay.style.display = "none";
+          formMessage.textContent = "";
+        }
+      };
+    }
+
+    if (thoughtForm) {
+      thoughtForm.addEventListener("submit", async function(e) {
+        e.preventDefault();
+        formMessage.textContent = "sending...";
+        try {
+          const response = await fetch(thoughtForm.action, {
+            method: "POST",
+            body: new FormData(thoughtForm),
+            headers: { 'Accept': 'application/json' }
+          });
+          if (response.ok) {
+            formMessage.textContent = "message sent";
+            thoughtForm.reset();
+          } else {
+            formMessage.textContent = "message not sent";
+          }
+        } catch (err) {
+          formMessage.textContent = "message not sent";
+        }
+      });
+    }
+
+    function startCountdown() {
+      let remaining = FIXED_DURATION;
+      const timer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(timer);
+          destroyMessage();
+        }
+      }, 1000);
+    }
+
+    function destroyMessage() {
+      localStorage.setItem("messageDestroyed:" + THOUGHT_VERSION, "true");
+      messageEl.classList.add("fade-out");
+      setTimeout(() => {
+        messageEl.innerHTML = "";
+        statusEl.textContent = "Message destroyed";
+        leaveBtn.style.display = "inline-block";
+      }, 1000);
+    }
+
+    function checkIfDestroyed() {
+      if (localStorage.getItem("messageDestroyed:" + THOUGHT_VERSION) === "true") {
+        messageEl.innerHTML = "";
+        statusEl.textContent = "Message destroyed";
+        leaveBtn.style.display = "inline-block";
+      } else {
+        renderThought();
+        startCountdown();
+      }
+    }
+
+    checkIfDestroyed();
+  </script>
+</body>
+</html>
